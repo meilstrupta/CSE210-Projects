@@ -2,26 +2,23 @@ namespace QpcrAnalyzer
 {
     public class Primer : DnaSequence
     {
-        public bool IsForward { get; set; }
+        private bool _isForward;
+
+        public bool IsForward
+        {
+            get => _isForward;
+            set => _isForward = value;
+        }
 
         public Primer(string name, string sequence, double concentration, bool isForward)
             : base(name, sequence, concentration)
         {
-            IsForward = isForward;
+            _isForward = isForward;
         }
 
-        // Forward primers use the sequence as-is.
-        // Reverse primers override this behavior in ReversePrimer.cs.
-        public override string GetReverseComplement()
-        {
-            return base.GetReverseComplement();
-        }
-
-        // Placeholder for future primer-specific logic
         public virtual string GetBindingSequence()
         {
-            // Forward primers bind directly; reverse primers override this.
-            return Sequence;
+            return Sequence; // forward primer binds as written, reverse primer will override this to return the reverse complement
         }
     }
 }

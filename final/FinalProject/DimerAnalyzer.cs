@@ -2,11 +2,10 @@ namespace QpcrAnalyzer
 {
     public class DimerAnalyzer
     {
-        // Simple 4-base complement check (your original logic)
-        public bool CheckForDimer(DnaSequence a, DnaSequence b)
+        public bool CheckForDimer(DnaSequence sequenceA, DnaSequence sequenceB)
         {
-            string seqA = a.Sequence;
-            string rcB = b.GetReverseComplement();
+            string seqA = sequenceA.Sequence;
+            string rcB = sequenceB.GetReverseComplement();
 
             for (int i = 0; i < seqA.Length - 3; i++)
             {
@@ -24,20 +23,18 @@ namespace QpcrAnalyzer
             return false;
         }
 
-        // Simple visualization: align sequences at position 0
-        public string VisualizeDimer(DnaSequence a, DnaSequence b)
+        public string VisualizeDimer(DnaSequence sequenceA, DnaSequence sequenceB)
         {
-            string seqA = a.Sequence;
-            string rcB = b.GetReverseComplement();
+            string seqA = sequenceA.Sequence;
+            string rcB = sequenceB.GetReverseComplement();
 
-            // Pad both sequences to the same length
             int maxLen = Math.Max(seqA.Length, rcB.Length);
 
             string paddedA = seqA.PadRight(maxLen);
             string paddedB = rcB.PadRight(maxLen);
 
-            // Build match line
             char[] match = new char[maxLen];
+
             for (int i = 0; i < maxLen; i++)
             {
                 if (i < seqA.Length && i < rcB.Length && IsBaseComplement(seqA[i], rcB[i]))

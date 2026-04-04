@@ -2,7 +2,7 @@ using System;
 
 namespace QpcrAnalyzer
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -12,7 +12,6 @@ namespace QpcrAnalyzer
             // USER INPUT SECTION
             // -----------------------------
 
-            // Forward primer
             Console.Write("Enter forward primer name: ");
             string fwdName = Console.ReadLine();
 
@@ -22,7 +21,6 @@ namespace QpcrAnalyzer
             Console.Write("Enter forward primer concentration (uM): ");
             double fwdConc = double.Parse(Console.ReadLine());
 
-            // Reverse primer
             Console.Write("\nEnter reverse primer name: ");
             string revName = Console.ReadLine();
 
@@ -32,7 +30,6 @@ namespace QpcrAnalyzer
             Console.Write("Enter reverse primer concentration (uM): ");
             double revConc = double.Parse(Console.ReadLine());
 
-            // Amplicon
             Console.Write("\nEnter amplicon name: ");
             string ampName = Console.ReadLine();
 
@@ -45,7 +42,6 @@ namespace QpcrAnalyzer
             Console.Write("Enter target gene name: ");
             string geneName = Console.ReadLine();
 
-            // Probe
             Console.Write("\nEnter probe name: ");
             string probeName = Console.ReadLine();
 
@@ -66,7 +62,7 @@ namespace QpcrAnalyzer
 
             Primer forward = new Primer(fwdName, fwdSeq, fwdConc, isForward: true);
             ReversePrimer reverse = new ReversePrimer(revName, revSeq, revConc);
-            Amplicon amp = new Amplicon(ampName, ampSeq, ampConc, geneName);
+            Amplicon amplicon = new Amplicon(ampName, ampSeq, ampConc, geneName);
             Probe probe = new Probe(probeName, probeSeq, probeConc, reporter);
 
             TmCalculator tmCalc = new TmCalculator();
@@ -79,19 +75,16 @@ namespace QpcrAnalyzer
 
             Console.WriteLine("=== RESULTS ===\n");
 
-            // Tm values
             Console.WriteLine("Melting Temperatures:");
             Console.WriteLine($"Forward Primer Tm: {tmCalc.CalculateTm(forward)} °C");
             Console.WriteLine($"Reverse Primer Tm: {tmCalc.CalculateTm(reverse)} °C");
             Console.WriteLine($"Probe Tm: {tmCalc.CalculateTm(probe)} °C\n");
 
-            // Reverse complement
             Console.WriteLine("Reverse Primer Binding Sequence:");
             Console.WriteLine(reverse.GetBindingSequence() + "\n");
 
-            // Highlighting
-            Console.WriteLine("Binding Site Highlighting on Amplicon:\n");
-            Console.WriteLine(highlighter.HighlightAll(amp, forward, probe, reverse) + "\n");
+            Console.WriteLine("Binding Sites Highlighting on Amplicon:\n");
+            Console.WriteLine(highlighter.HighlightAll(amplicon, forward, probe, reverse) + "\n");
 
             // -----------------------------
             // FULL DIMER TESTING
@@ -113,17 +106,17 @@ namespace QpcrAnalyzer
         // -----------------------------
         // DIMER TESTING METHOD
         // -----------------------------
-        static void TestPair(string label, DnaSequence a, DnaSequence b, DimerAnalyzer dimer)
+        static void TestPair(string label, DnaSequence sequenceA, DnaSequence sequenceB, DimerAnalyzer dimer)
         {
             Console.WriteLine($"\n--- {label} ---");
 
-            if (dimer.CheckForDimer(a, b))
+            if (dimer.CheckForDimer(sequenceA, sequenceB))
             {
-                Console.WriteLine(dimer.VisualizeDimer(a, b));
+                Console.WriteLine(dimer.VisualizeDimer(sequenceA, sequenceB));
             }
             else
             {
-                Console.WriteLine($"[No dimer detected between {a.Name} and {b.Name}]");
+                Console.WriteLine($"[No dimer detected between {sequenceA.Name} and {sequenceB.Name}]");
             }
         }
     }

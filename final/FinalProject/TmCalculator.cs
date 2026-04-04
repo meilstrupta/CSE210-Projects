@@ -2,19 +2,17 @@ namespace QpcrAnalyzer
 {
     public class TmCalculator
     {
-        // Basic melting temperature formula:
-        // Tm = 2°C * (# of A/T) + 4°C * (# of G/C)
-        // This is the classic Wallace rule. Will not be perfectly accurate.
-        public double CalculateTm(DnaSequence seq)
+        // Wallace rule: Tm = 2*(A/T) + 4*(G/C)
+        public double CalculateTm(DnaSequence sequence)
         {
             int atCount = 0;
             int gcCount = 0;
 
-            foreach (char n in seq.Sequence)
+            foreach (char nucleotide in sequence.Sequence)
             {
-                if (n == 'A' || n == 'T')
+                if (nucleotide == 'A' || nucleotide == 'T')
                     atCount++;
-                else if (n == 'G' || n == 'C')
+                else if (nucleotide == 'G' || nucleotide == 'C')
                     gcCount++;
             }
 

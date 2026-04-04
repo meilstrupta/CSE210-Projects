@@ -5,37 +5,34 @@ namespace QpcrAnalyzer
 {
     public class SequenceHighlighter
     {
-        // ANSI escape codes for red + reset
-        private const string RED   = "\u001b[31m";
-        private const string RESET = "\u001b[0m";
+        private const string Red   = "\u001b[31m";
+        private const string Reset = "\u001b[0m";
 
-        // Highlight a single feature (keeps your old behavior, now with color)
-        public string Highlight(Amplicon amp, DnaSequence feature)
+        public string Highlight(Amplicon amplicon, DnaSequence feature)
         {
-            string ampSeq = amp.Sequence;
+            string ampSeq = amplicon.Sequence;
             string bindingSeq = GetBindingSequence(feature);
 
             int index = ampSeq.IndexOf(bindingSeq, StringComparison.Ordinal);
 
             if (index == -1)
             {
-                return $"[No binding site found for {feature.Name} on {amp.Name}]";
+                return $"[No binding site found for {feature.Name} on {amplicon.Name}]";
             }
 
             string highlighted =
                 ampSeq.Substring(0, index) +
-                RED + "[" +
+                Red + "[" +
                 ampSeq.Substring(index, bindingSeq.Length) +
-                "]" + RESET +
+                "]" + Reset +
                 ampSeq.Substring(index + bindingSeq.Length);
 
             return highlighted;
         }
 
-        // Highlight forward, probe, and reverse all on the same amplicon
-        public string HighlightAll(Amplicon amp, Primer forward, Probe probe, ReversePrimer reverse)
+        public string HighlightAll(Amplicon amplicon, Primer forward, Probe probe, ReversePrimer reverse)
         {
-            string ampSeq = amp.Sequence;
+            string ampSeq = amplicon.Sequence;
 
             var regions = new List<(int start, int length)>
             {
@@ -44,26 +41,24 @@ namespace QpcrAnalyzer
                 MakeRegion(ampSeq, reverse)
             };
 
-            // Remove any that weren't found
             regions.RemoveAll(r => r.start == -1);
 
             if (regions.Count == 0)
                 return "[No binding sites found on amplicon]";
 
-            // Sort left → right
             regions.Sort((a, b) => a.start.CompareTo(b.start));
 
             string result = "";
             int cursor = 0;
 
-            foreach (var r in regions)
+            foreach (var region in regions)
             {
-                if (cursor < r.start)
-                    result += ampSeq.Substring(cursor, r.start - cursor);
+                if (cursor < region.start)
+                    result += ampSeq.Substring(cursor, region.start - cursor);
 
-                result += RED + "[" + ampSeq.Substring(r.start, r.length) + "]" + RESET;
+                result += Red + "[" + ampSeq.Substring(region.start, region.length) + "]" + Reset;
 
-                cursor = r.start + r.length;
+                cursor = region.start + region.length;
             }
 
             if (cursor < ampSeq.Length)
@@ -79,22 +74,15 @@ namespace QpcrAnalyzer
             return (index, bindingSeq.Length);
         }
 
-        // Centralized binding logic (this is the key fix)
-        private string GetBindingSequence(DnaSequence seq)
+        private string GetBindingSequence(DnaSequence sequence)
         {
-            if (seq is Primer primer)
-            {
-                // Forward primer: Sequence
-                // Reverse primer: override returns reverse complement
+            if (sequence is Primer primer)
                 return primer.GetBindingSequence();
-            }
 
-            if (seq is Probe probe)
-            {
+            if (sequence is Probe probe)
                 return probe.Sequence;
-            }
 
-            return seq.Sequence;
+            return sequence.Sequence;
         }
     }
 }

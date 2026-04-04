@@ -2,20 +2,42 @@ namespace QpcrAnalyzer
 {
     public abstract class DnaSequence
     {
-        public string Name { get; set; }
-        public string Sequence { get; set; }
-        public double Concentration { get; set; }
+        // Private attributes
+        private string _name;
+        private string _sequence;
+        private double _concentration;
 
-        protected DnaSequence(string name, string sequence, double concentration)
+        // Public properties
+        public string Name
         {
-            Name = name;
-            Sequence = sequence.ToUpper();
-            Concentration = concentration;
+            get => _name;
+            set => _name = value;
         }
 
+        public string Sequence
+        {
+            get => _sequence;
+            set => _sequence = value.ToUpper();
+        }
+
+        public double Concentration
+        {
+            get => _concentration;
+            set => _concentration = value;
+        }
+
+        // Constructor
+        protected DnaSequence(string name, string sequence, double concentration)
+        {
+            _name = name;
+            _sequence = sequence.ToUpper();
+            _concentration = concentration;
+        }
+
+        // Behaviors
         public int GetLength()
         {
-            return Sequence.Length;
+            return _sequence.Length;
         }
 
         public virtual string GetReverseComplement()
@@ -29,11 +51,11 @@ namespace QpcrAnalyzer
                 _ => 'N'
             };
 
-            char[] rc = new char[Sequence.Length];
+            char[] rc = new char[_sequence.Length];
 
-            for (int i = 0; i < Sequence.Length; i++)
+            for (int i = 0; i < _sequence.Length; i++)
             {
-                rc[i] = Complement(Sequence[Sequence.Length - 1 - i]);
+                rc[i] = Complement(_sequence[_sequence.Length - 1 - i]);
             }
 
             return new string(rc);
