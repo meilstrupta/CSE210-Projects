@@ -1,160 +1,130 @@
 using System;
-using System.Collections.Generic;
 
 namespace QpcrAnalyzer
 {
-    // -----------------------------
-    // Abstract Base Class
-    // -----------------------------
-    public abstract class DnaSequence
-    {
-        public string Name { get; set; }
-        public string Sequence { get; set; }
-        public double Concentration { get; set; }
-
-        public DnaSequence(string name, string sequence, double concentration)
-        {
-            Name = name;
-            Sequence = sequence;
-            Concentration = concentration;
-        }
-
-        public int GetLength()
-        {
-            return Sequence.Length;
-        }
-
-        public virtual string GetReverseComplement()
-        {
-            char Complement(char b) => b switch
-            {
-                'A' => 'T',
-                'T' => 'A',
-                'C' => 'G',
-                'G' => 'C',
-                _ => 'N'
-            };
-
-            char[] rc = new char[Sequence.Length];
-            for (int i = 0; i < Sequence.Length; i++)
-            {
-                rc[i] = Complement(Sequence[Sequence.Length - 1 - i]);
-            }
-            return new string(rc);
-        }
-    }
-
-    // -----------------------------
-    // Primer
-    // -----------------------------
-    public class Primer : DnaSequence
-    {
-        public bool IsForward { get; set; }
-
-        public Primer(string name, string sequence, double concentration, bool isForward)
-            : base(name, sequence, concentration)
-        {
-            IsForward = isForward;
-        }
-
-        public override string GetReverseComplement()
-        {
-            // Reverse primers need reverse complement
-            return base.GetReverseComplement();
-        }
-    }
-
-    // -----------------------------
-    // Probe
-    // -----------------------------
-    public class Probe : DnaSequence
-    {
-        public string Fluorophore { get; set; }
-        public string Quencher { get; set; }
-
-        public Probe(string name, string sequence, double concentration,
-                     string fluorophore, string quencher)
-            : base(name, sequence, concentration)
-        {
-            Fluorophore = fluorophore;
-            Quencher = quencher;
-        }
-    }
-
-    // -----------------------------
-    // Amplicon
-    // -----------------------------
-    public class Amplicon : DnaSequence
-    {
-        public string TargetGene { get; set; }
-
-        public Amplicon(string name, string sequence, double concentration, string targetGene)
-            : base(name, sequence, concentration)
-        {
-            TargetGene = targetGene;
-        }
-    }
-
-    // -----------------------------
-    // Tm Calculator
-    // -----------------------------
-    public class TmCalculator
-    {
-        public double CalculateTm(DnaSequence seq)
-        {
-            // Placeholder formula
-            return seq.GetLength() * 2.0;
-        }
-    }
-
-    // -----------------------------
-    // Dimer Analyzer
-    // -----------------------------
-    public class DimerAnalyzer
-    {
-        public bool CheckForDimer(DnaSequence a, DnaSequence b)
-        {
-            // Placeholder logic
-            return false;
-        }
-    }
-
-    // -----------------------------
-    // Sequence Highlighter
-    // -----------------------------
-    public class SequenceHighlighter
-    {
-        public string Highlight(Amplicon amp, DnaSequence feature)
-        {
-            // Placeholder: just returns the amplicon
-            return amp.Sequence;
-        }
-    }
-
-    // -----------------------------
-    // Program Interaction
-    // -----------------------------
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to the qPCR Primer Analyzer!");
+            Console.WriteLine("=== qPCR Primer Analyzer ===\n");
 
-            // Example interaction
-            Amplicon amp = new Amplicon("MyAmplicon", "ATCGATCGATCG", 50, "GAPDH");
-            Primer fwd = new Primer("Forward", "ATCGA", 20, true);
-            Primer rev = new Primer("Reverse", "CGATC", 20, false);
-            Probe probe = new Probe("Probe", "TCGAT", 10, "FAM", "BHQ1");
+            // -----------------------------
+            // USER INPUT SECTION
+            // -----------------------------
+
+            // Forward primer
+            Console.Write("Enter forward primer name: ");
+            string fwdName = Console.ReadLine();
+
+            Console.Write("Enter forward primer sequence: ");
+            string fwdSeq = Console.ReadLine();
+
+            Console.Write("Enter forward primer concentration (uM): ");
+            double fwdConc = double.Parse(Console.ReadLine());
+
+            // Reverse primer
+            Console.Write("\nEnter reverse primer name: ");
+            string revName = Console.ReadLine();
+
+            Console.Write("Enter reverse primer sequence: ");
+            string revSeq = Console.ReadLine();
+
+            Console.Write("Enter reverse primer concentration (uM): ");
+            double revConc = double.Parse(Console.ReadLine());
+
+            // Amplicon
+            Console.Write("\nEnter amplicon name: ");
+            string ampName = Console.ReadLine();
+
+            Console.Write("Enter amplicon sequence: ");
+            string ampSeq = Console.ReadLine();
+
+            Console.Write("Enter amplicon concentration (# of initial copies): ");
+            double ampConc = double.Parse(Console.ReadLine());
+
+            Console.Write("Enter target gene name: ");
+            string geneName = Console.ReadLine();
+
+            // Probe
+            Console.Write("\nEnter probe name: ");
+            string probeName = Console.ReadLine();
+
+            Console.Write("Enter probe sequence: ");
+            string probeSeq = Console.ReadLine();
+
+            Console.Write("Enter probe concentration (uM): ");
+            double probeConc = double.Parse(Console.ReadLine());
+
+            Console.Write("Enter reporter dye (e.g., FAM, HEX, Cy5): ");
+            string reporter = Console.ReadLine();
+
+            Console.WriteLine("\n--- Constructing objects... ---\n");
+
+            // -----------------------------
+            // OBJECT CREATION
+            // -----------------------------
+
+            Primer forward = new Primer(fwdName, fwdSeq, fwdConc, isForward: true);
+            ReversePrimer reverse = new ReversePrimer(revName, revSeq, revConc);
+            Amplicon amp = new Amplicon(ampName, ampSeq, ampConc, geneName);
+            Probe probe = new Probe(probeName, probeSeq, probeConc, reporter);
 
             TmCalculator tmCalc = new TmCalculator();
-            Console.WriteLine($"Forward Tm: {tmCalc.CalculateTm(fwd)}");
-            Console.WriteLine($"Reverse Tm: {tmCalc.CalculateTm(rev)}");
-            Console.WriteLine($"Probe Tm: {tmCalc.CalculateTm(probe)}");
+            DimerAnalyzer dimer = new DimerAnalyzer();
+            SequenceHighlighter highlighter = new SequenceHighlighter();
 
-            Console.WriteLine("Reverse primer reverse complement:");
-            Console.WriteLine(rev.GetReverseComplement());
+            // -----------------------------
+            // OUTPUT SECTION
+            // -----------------------------
 
-            Console.WriteLine("Program finished successfully.");
+            Console.WriteLine("=== RESULTS ===\n");
+
+            // Tm values
+            Console.WriteLine("Melting Temperatures:");
+            Console.WriteLine($"Forward Primer Tm: {tmCalc.CalculateTm(forward)} °C");
+            Console.WriteLine($"Reverse Primer Tm: {tmCalc.CalculateTm(reverse)} °C");
+            Console.WriteLine($"Probe Tm: {tmCalc.CalculateTm(probe)} °C\n");
+
+            // Reverse complement
+            Console.WriteLine("Reverse Primer Binding Sequence:");
+            Console.WriteLine(reverse.GetBindingSequence() + "\n");
+
+            // Highlighting
+            Console.WriteLine("Binding Site Highlighting on Amplicon:\n");
+            Console.WriteLine(highlighter.HighlightAll(amp, forward, probe, reverse) + "\n");
+
+            // -----------------------------
+            // FULL DIMER TESTING
+            // -----------------------------
+            Console.WriteLine("=== DIMER TESTING ===");
+
+            TestPair("Forward vs Forward", forward, forward, dimer);
+            TestPair("Reverse vs Reverse", reverse, reverse, dimer);
+            TestPair("Probe vs Probe", probe, probe, dimer);
+
+            TestPair("Forward vs Reverse", forward, reverse, dimer);
+            TestPair("Forward vs Probe", forward, probe, dimer);
+            TestPair("Reverse vs Probe", reverse, probe, dimer);
+
+            Console.WriteLine("\nAnalysis complete. Press Enter to exit.");
+            Console.ReadLine();
+        }
+
+        // -----------------------------
+        // DIMER TESTING METHOD
+        // -----------------------------
+        static void TestPair(string label, DnaSequence a, DnaSequence b, DimerAnalyzer dimer)
+        {
+            Console.WriteLine($"\n--- {label} ---");
+
+            if (dimer.CheckForDimer(a, b))
+            {
+                Console.WriteLine(dimer.VisualizeDimer(a, b));
+            }
+            else
+            {
+                Console.WriteLine($"[No dimer detected between {a.Name} and {b.Name}]");
+            }
         }
     }
 }
